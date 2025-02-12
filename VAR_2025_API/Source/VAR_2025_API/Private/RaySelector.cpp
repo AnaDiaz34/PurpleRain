@@ -11,14 +11,27 @@ UVodget* URaySelector::DoRaycast()
 {
 	UVodget* retval = nullptr;
 
-	// Set FCollisionQueryParams to customize various properties about the trace
 
+	// Set FCollisionQueryParams to customize various properties about the trace
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetOwner());
 
 	// Use LineTraceSingleByChannel to find Vodgets.
+	// The hit result gets populated by the line trace
+	FHitResult Hit;
 
+	FVector Start(0.0, 0.0, 0.0);
+	FVector End(1000.0, 0.0, 0.0);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_PhysicsBody, Params, FCollisionResponseParams());
 
 	// Move the marker to the controller world location when no vodget is found otherwise move to the hit point.
 
+	//if something is hit, check to see the componet
+	//UStaticMeshComponent* mesh = Cast<UStaticMeshComponent>(scenecomponent);
+	if (bHit) 
+	{
+
+	}
 
 	return retval;
 }
