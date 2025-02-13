@@ -12,21 +12,16 @@ UVodget* URaySelector::DoRaycast()
 	UVodget* retval = nullptr;
 
 	// Set FCollisionQueryParams to customize various properties about the trace
-<<<<<<< Updated upstream
 
-=======
 	FCollisionQueryParams Params;
 	//note this pretty much ignores us(our controller/hand)
 	Params.AddIgnoredActor(GetOwner());	
->>>>>>> Stashed changes
 
-	// Use LineTraceSingleByChannel to find Vodgets.
-
-<<<<<<< Updated upstream
+	// Use LineTraceSingleByChannel to find Vodgets
 
 	// Move the marker to the controller world location when no vodget is found otherwise move to the hit point.
+	FHitResult Hit;
 
-=======
 	FVector Start(hand->GetComponentLocation());
 	FVector End( Start + (hand->GetForwardVector() * 1000.0));
 	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_PhysicsBody, Params, FCollisionResponseParams());
@@ -49,7 +44,6 @@ UVodget* URaySelector::DoRaycast()
 		marker->SetWorldLocation(selectedPosition);
 	}
 	retval = Cast<UVodget>(Hit.GetComponent());
->>>>>>> Stashed changes
 
 	return retval;
 }
