@@ -18,7 +18,6 @@ UVodget* URaySelector::DoRaycast()
 	Params.AddIgnoredActor(GetOwner());	
 
 	// Use LineTraceSingleByChannel to find Vodgets
-
 	// Move the marker to the controller world location when no vodget is found otherwise move to the hit point.
 	FHitResult Hit;
 
@@ -27,7 +26,7 @@ UVodget* URaySelector::DoRaycast()
 	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_PhysicsBody, Params, FCollisionResponseParams());
 
 	// Move the marker to the controller world location when no vodget is found otherwise move to the hit point.
-	//if something is hit
+	//if something is hit check if its a vodget
 	//UStaticMeshComponent* mesh = Cast<UStaticMeshComponent>(scenecomponent);
 	FVector selectedPosition;
 	if (bHit) 
