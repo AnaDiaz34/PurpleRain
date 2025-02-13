@@ -32,6 +32,19 @@ UVodget* URaySelector::DoRaycast()
 	if (bHit) 
 	{
 		selectedPosition = Hit.Location;
+
+		USceneComponent* foundComponent = Cast<USceneComponent>(Hit.Component);
+		if (foundComponent != nullptr)
+		{
+			for (size_t i = 0; i < foundComponent->GetNumChildrenComponents(); i++)
+			{
+				retval = Cast<UVodget>(foundComponent->GetChildComponent(i));
+				if (retval != nullptr)
+				{
+					break;
+				}
+			}
+		}
 	}
 	else
 	{
@@ -42,8 +55,6 @@ UVodget* URaySelector::DoRaycast()
 	{
 		marker->SetWorldLocation(selectedPosition);
 	}
-	retval = Cast<UVodget>(Hit.GetComponent());
-
 	return retval;
 }
 
