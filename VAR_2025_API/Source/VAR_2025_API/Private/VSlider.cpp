@@ -62,6 +62,7 @@ void UVSlider::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	//currentPos.Set(currentPos.X, currentPos.Y, currentPos.Z + deltaZ);
 	currentPos.Z = FMath::Clamp(currentPos.Z + deltaZ, minval, maxval);
 	//currentPos.Z += deltaZ;
+
 	clientComponent->SetRelativeLocation(currentPos);
 	// Once the knob is moving correctly within its slot calculate the percentage that the knob is between
 	// its minimum and maximum value and broadcast the percentage to all callbacks registered to SliderDelegate.
