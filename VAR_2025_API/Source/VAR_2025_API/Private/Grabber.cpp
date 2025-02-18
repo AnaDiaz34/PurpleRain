@@ -32,7 +32,7 @@ void UGrabber::ForePinch(USelector* selector, bool state)
 	}
 	
 	// Use PrimaryComponentTick.SetTickFunctionEnable to turn tick on when grabbing and off when not grabbing.
-	PrimaryComponentTick.SetTickFunctionEnable(state);
+	//PrimaryComponentTick.SetTickFunctionEnable(state);
 }
 
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

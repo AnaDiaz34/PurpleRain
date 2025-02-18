@@ -18,8 +18,14 @@ void UVDial::ForePinch(USelector* selector, bool state)
 		FVector localPosition = clientComponent->GetComponentTransform().InverseTransformPosition(worldPosition);
 		//DegreesToRadians()
 		// save the grabvec in the plane along which the dial spins.
-		grabvec = FVector(0.0f, localPosition.Y, localPosition.Z);
+		grabvec = FVector(localPosition.X, localPosition.Y, 0.0f);
 	}
+	else
+	{
+		Focus(grabbingSelector, false);
+		PrimaryComponentTick.SetTickFunctionEnable(state);
+	}
+
 }
 
 void UVDial::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -31,22 +37,12 @@ void UVDial::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponent
 	{
 		
 		FVector worldPosition = grabbingSelector->Cursor().GetLocation();
-		FVector localPosition = clientComponent->GetComponentTransform().InverseTransformPosition(worldPosition);
 
-		FVector currentVect = FVector(0.0f, localPosition.Y, localPosition.Z);
-
-		FQuat deltaQ = FQuat::FindBetweenVectors(grabvec, currentVect);
-		//FVector testvec = dq * grabvec; This is what the previous line does
-
-		clientComponent->AddRelativeRotation(deltaQ);
 
 	// Once the dial is spinning freely we need to calculate the angle of the dials notch with its parent notch.
 	// Determine the unit "notch" vector that points toward the dials notch in the dials local space.
 	// Rotate the notch vector by the dials local quaternion and use the dot product with the unrotated notch vector 
 	// to calculate the radians between these vectors and convert the radians to degrees.
-
-
-		//RadiansToDegrees()
 
 	// As you now spin the dial the degrees will go from 0..180 and back to 0.
 	// Look at the XYZ components of the rotated vector and determine which value is positive/negative when degrees

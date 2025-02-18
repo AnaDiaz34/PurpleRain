@@ -25,7 +25,7 @@ void UVSlider::ForePinch(USelector* selector, bool state)
 		initialgrabval = localPosition.Z;
 
 		//UE_LOG(LogTemp, Warning, TEXT("Initial:%f"), initialgrabval );
-	}
+	} else {
 	//FTransform cursor = selector->Cursor().GetLocation().Z;
 	//FTransform worldPosition = cur
 	//FTransform worldPosition = Get
@@ -34,9 +34,10 @@ void UVSlider::ForePinch(USelector* selector, bool state)
 	
 	// Don't forget to grab and release selector focus appropriately.
 
-		//Focus(grabbingSelector, false);
+		Focus(grabbingSelector, false);
 		//turn off tick
-		//PrimaryComponentTick.SetTickFunctionEnable(state);
+		PrimaryComponentTick.SetTickFunctionEnable(state);
+	}
 }
 
 void UVSlider::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
