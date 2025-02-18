@@ -36,6 +36,7 @@ void UVSlider::ForePinch(USelector* selector, bool state)
 
 		Focus(grabbingSelector, false);
 		//turn off tick
+		PrimaryComponentTick.SetTickFunctionEnable(state);
 	}
 }
 
@@ -58,11 +59,14 @@ void UVSlider::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 	FVector currentPos = clientComponent->GetRelativeLocation();
 
-	currentPos.Set(currentPos.X, currentPos.Y, currentPos.Z + deltaZ);
+	//currentPos.Set(currentPos.X, currentPos.Y, currentPos.Z + deltaZ);
+	currentPos.Z = FMath::Clamp(currentPos.Z + deltaZ, minval, maxval);
 	//currentPos.Z += deltaZ;
 	clientComponent->SetRelativeLocation(currentPos);
 	// Once the knob is moving correctly within its slot calculate the percentage that the knob is between
 	// its minimum and maximum value and broadcast the percentage to all callbacks registered to SliderDelegate.
 	// e.g.: SliderDelegate.Broadcast(pct);
+	float pct = (currentPos.Z - minval) / (maxval - minval);
+	SliderDelegate.Broadcast(pct);
 
 }

@@ -41,13 +41,12 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	// to world space and set the clients world transform to the result.
 	if (grabbingSelector)
 	{
-		FVector worldPosition = grabbingSelector->Cursor().GetLocation();
-		FQuat worldRotation = grabbingSelector->Cursor().GetRotation();
-		//convert the childstrt back to world space
-		FVector newPosition = worldPosition + worldRotation * childsrt.GetLocation();
-		FQuat newRotation = worldRotation * childsrt.GetRotation();
+		FTransform cursorWorldTransform = FTransform(grabbingSelector->Cursor().GetRotation(), grabbingSelector->Cursor().GetLocation());
 
-		//set the clients world transform to the result
-		clientComponent->SetWorldLocationAndRotation(newPosition, newRotation.Rotator());
+		// Apply `childsrt` to get the new world transform
+		FTransform newWorldTransform = cursorWorldTransform * childsrt;
+
+		// Apply the calculated world transform to the grabbed object
+		clientComponent->SetWorldTransform(newWorldTransform);
 	}
 }
