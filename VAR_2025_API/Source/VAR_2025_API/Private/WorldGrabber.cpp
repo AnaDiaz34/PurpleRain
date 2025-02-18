@@ -3,8 +3,6 @@
 #include "Components/SceneComponent.h"
 #include <Kismet/GameplayStatics.h>
 
-//#include <VRPawn.h> giving me errors
-
 // Sets default values for this component's properties
 UWorldGrabber::UWorldGrabber()
 {
