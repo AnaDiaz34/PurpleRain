@@ -1,3 +1,4 @@
+#define WORLDTOMETERS_SCALING
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "WorldGrabber.h"
 #include "Components/SceneComponent.h"
@@ -26,19 +27,24 @@ void UWorldGrabber::SetLocalCursor()
 
 		FVector xAxis = left - right;
 		FVector zAxis = FVector::UpVector;
-		FMatrix rotation = FRotationMatrix::MakeFromXZ(xAxis, zAxis);
-		cursorsrt.SetRotation(rotation.ToQuat());
 
 		if (dollyMode)
 		{
-			FVector wonkyUP = cursorsrt.GetRotation() * FVector::UpVector;
-			//want the quat that rotates wonky up to up vector and if
-			FQuat correctQuat = FQuat::FindBetweenVectors(wonkyUP, FVector::UpVector);
-			FQuat correctRotation = correctQuat * cursorsrt.GetRotation();
-
-			cursorsrt.SetRotation(correctRotation);
-			
+			xAxis.Z = 0.0f;
 		}
+		FMatrix rotation = FRotationMatrix::MakeFromXZ(xAxis, zAxis);
+		cursorsrt.SetRotation(rotation.ToQuat());
+
+		//if (dollyMode)
+		//{
+		//	FVector wonkyUP = cursorsrt.GetRotation() * FVector::UpVector;
+		//	//want the quat that rotates wonky up to up vector and if
+		//	FQuat correctQuat = FQuat::FindBetweenVectors(wonkyUP, FVector::UpVector);
+		//	FQuat correctRotation = correctQuat * cursorsrt.GetRotation();
+
+		//	cursorsrt.SetRotation(correctRotation);
+		//	
+		//}
 
 		if (scaleMode) {
 #ifdef WORLDTOMETERS_SCALING
@@ -65,7 +71,14 @@ void UWorldGrabber::SetLocalCursor()
 #else
 			// Scale the cursor by the ratio of current and initial distance between the hands.
 			// Note: Scaling the Pawn in Unreal is best done by changing the WorldToMeters setting.
-
+			float currentDistance = FVector::Distance(right, left);
+			float ratio = currentDistance / initialBimanualHandDist;
+			//FVector::One* ratio;
+			cursorsrt.SetScale3D(FVector(ratio));
+			//currWorldToMeters
+			//currWorldToMeters = initialWorldToMeters / ratio;
+			//GetOwner()->GetWorldSettings()->WorldToMeters = currWorldToMeters;
+			
 #endif
 		}
 		else
@@ -106,7 +119,15 @@ void UWorldGrabber::GrabChanged()
 	worldsrt = FTransform::Identity;
 
 	// Save the distance between hands when bimanual scaling is enabled. 
-	initialBimanualHandDist = rightHand - leftHand;
+	if (leftGrabbing && rightGrabbing)
+	{
+		initialBimanualHandDist = FVector::Distance(rightHand->GetComponentLocation(), leftHand->GetComponentLocation());
+		//or initialBimanualHandDist = (rightHand->GetComponentLocation() - leftHand->GetComponentLocation()).Length();
+		if (scaleMode)
+		{
+			initialWorldToMeters = currWorldToMeters;
+		}
+	}
 
 	// Save the worldsrt as a child of the updated cursor(cursor is our hand in this case, or the cursorsrt).
 	SetLocalCursor();

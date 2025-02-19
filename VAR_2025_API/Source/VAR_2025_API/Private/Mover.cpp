@@ -16,6 +16,7 @@ UMover::UMover()
 void UMover::MoveUpDown(const float percentage)
 {
 	UE_LOG(LogTemp, Warning, TEXT("UpDown:%f"), percentage);
+	
 
 }
 
