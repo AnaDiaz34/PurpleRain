@@ -44,9 +44,13 @@ private:
 	bool leftGrabbing = false;
 	bool rightGrabbing = false;
 
+	//
 	FTransform childsrt;
+	//this is an object we're grabbing 
 	FTransform worldsrt;
+	//model of our own cursor(or our selector)
 	FTransform cursorsrt;
+
 	float initialBimanualHandDist;
 
 	// Called every frame

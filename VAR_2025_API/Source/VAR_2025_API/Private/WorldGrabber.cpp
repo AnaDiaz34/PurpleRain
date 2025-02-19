@@ -7,9 +7,11 @@
 UWorldGrabber::UWorldGrabber()
 {
 	// Set this component to be ticked every frame.  
-
+	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = false;
 }
 
+//New actualy method name should be SetCursor() but can't change the name due to errors that would arrise
 void UWorldGrabber::SetLocalCursor()
 {
 	if (leftGrabbing && rightGrabbing)
@@ -18,8 +20,25 @@ void UWorldGrabber::SetLocalCursor()
 		FVector left = leftHand->GetComponentLocation();
 		FVector right = rightHand->GetComponentLocation();
 
+		cursorsrt.SetLocation((left + right) * 0.5f);
 		// Set the cursor rotation to the FRotationMatrix::MakeFromXZ where X is the vector between the hands and Z is up.
 		// If dollyMode constrain rotation to rotate about Z up only.
+
+		FVector xAxis = left - right;
+		FVector zAxis = FVector::UpVector;
+		FMatrix rotation = FRotationMatrix::MakeFromXZ(xAxis, zAxis);
+		cursorsrt.SetRotation(rotation.ToQuat());
+
+		if (dollyMode)
+		{
+			FVector wonkyUP = cursorsrt.GetRotation() * FVector::UpVector;
+			//want the quat that rotates wonky up to up vector and if
+			FQuat correctQuat = FQuat::FindBetweenVectors(wonkyUP, FVector::UpVector);
+			FQuat correctRotation = correctQuat * cursorsrt.GetRotation();
+
+			cursorsrt.SetRotation(correctRotation);
+			
+		}
 
 		if (scaleMode) {
 #ifdef WORLDTOMETERS_SCALING
@@ -46,6 +65,7 @@ void UWorldGrabber::SetLocalCursor()
 #else
 			// Scale the cursor by the ratio of current and initial distance between the hands.
 			// Note: Scaling the Pawn in Unreal is best done by changing the WorldToMeters setting.
+
 #endif
 		}
 		else
@@ -55,33 +75,46 @@ void UWorldGrabber::SetLocalCursor()
 	}
 	else if (leftGrabbing)
 	{
+		cursorsrt = leftHand->GetComponentTransform();
+		cursorsrt.SetRotation(FQuat::Identity);
 	}
 	else if (rightGrabbing)
 	{
+		cursorsrt = rightHand->GetComponentTransform();
+		cursorsrt.SetRotation(FQuat::Identity);
 	}
 }
 
 void UWorldGrabber::LWorldGrab(const bool Value)
 {
 	leftGrabbing = Value;
-	//UE_LOG(LogTemp, Warning, TEXT("WorldGrabber LEFT:%s"), *FString((lController != nullptr) ? "GRAB" : "RELEASE"));
+	UE_LOG(LogTemp, Warning, TEXT("WorldGrabber LEFT:%s"), *FString((Value) ? "GRAB" : "RELEASE"));
 	GrabChanged();
 }
 
 void UWorldGrabber::RWorldGrab(const bool Value)
 {
 	rightGrabbing = Value;
-	//UE_LOG(LogTemp, Warning, TEXT("WorldGrabber RIGHT:%s"), *FString((rController != nullptr) ? "GRAB" : "RELEASE"));
+	UE_LOG(LogTemp, Warning, TEXT("WorldGrabber RIGHT:%s"), *FString((Value) ? "GRAB" : "RELEASE"));
 	GrabChanged();
 }
 
 void UWorldGrabber::GrabChanged()
 {
+	PrimaryComponentTick.SetTickFunctionEnable(leftGrabbing || rightGrabbing);
 	// Reset worldsrt whenever the grab cursor configuration changes.
+	worldsrt = FTransform::Identity;
 
 	// Save the distance between hands when bimanual scaling is enabled. 
-	
-	// Save the worldsrt as a child of the updated cursor.
+	initialBimanualHandDist = rightHand - leftHand;
+
+	// Save the worldsrt as a child of the updated cursor(cursor is our hand in this case, or the cursorsrt).
+	SetLocalCursor();
+	//rightHand->GetOwner()->AddComponent(worldsrt);
+	//Note: childsrt = cursorsrt.Invsere() * worldsrt; would work as the lower code, but only if we havne't set worldsrt to Identity like we did
+	//before
+	childsrt = cursorsrt.Inverse();
+
 }
 
 void UWorldGrabber::DollyToggle(const bool Value) { dollyMode = !dollyMode; }
@@ -94,8 +127,14 @@ void UWorldGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 
 	// Calculate where the worldsrt would be IF we could actually move the world.
 
+	//Dont forget to change the cursor
+	SetLocalCursor();
+
+	//Where would the world be now
+	worldsrt = childsrt * cursorsrt;
+
 	// Then calculate where the current pawn would be as a child of that changed world.
-
+	FTransform meAsAChildOfTheWorld = GetOwner()->GetRootComponent()->GetComponentTransform() * worldsrt.Inverse();
 	// Set the pawn to your result.
-
+	GetOwner()->SetActorTransform(meAsAChildOfTheWorld);
 }

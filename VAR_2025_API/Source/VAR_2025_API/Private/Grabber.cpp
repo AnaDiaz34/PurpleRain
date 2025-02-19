@@ -18,13 +18,18 @@ void UGrabber::ForePinch(USelector* selector, bool state)
 		// Save the grabbing selector.
 		grabbingSelector = selector; 
 		// Set childsrt to the clients transform as a child of the selectors cursor.
-		FVector worldPosition = grabbingSelector->Cursor().GetLocation();
-		FVector localPosition = clientComponent->GetComponentTransform().InverseTransformPosition(worldPosition);
-		FQuat worldRotation = grabbingSelector->Cursor().GetRotation();
-		FQuat localRotation = clientComponent->GetComponentTransform().InverseTransformRotation(worldRotation);
+		
+		//FVector worldPosition = grabbingSelector->Cursor().GetLocation();
+		//FVector localPosition = clientComponent->GetComponentTransform().InverseTransformPosition(worldPosition);
+		//FQuat worldRotation = grabbingSelector->Cursor().GetRotation();
+		//FQuat localRotation = clientComponent->GetComponentTransform().InverseTransformRotation(worldRotation);
 
-		childsrt.SetLocation(localPosition);
-		childsrt.SetRotation(localRotation);
+		//childsrt.SetLocation(localPosition);
+		//childsrt.SetRotation(localRotation);
+
+		
+		childsrt = clientComponent->GetComponentTransform() * selector->Cursor().Inverse();
+		
 	}
 	else {
 		// Clear the grabbing selector.
@@ -41,13 +46,16 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	// to world space and set the clients world transform to the result.
 	if (grabbingSelector)
 	{
-		FVector worldPosition = grabbingSelector->Cursor().GetLocation();
-		FQuat worldRotation = grabbingSelector->Cursor().GetRotation();
-		//convert the childstrt back to world space
-		FVector newPosition = worldPosition + worldRotation * childsrt.GetLocation();
-		FQuat newRotation = worldRotation * childsrt.GetRotation();
+		//FVector worldPosition = grabbingSelector->Cursor().GetLocation();
+		//FQuat worldRotation = grabbingSelector->Cursor().GetRotation();
+		////convert the childstrt back to world space
+		//FVector newPosition = worldPosition + worldRotation * childsrt.GetLocation();
+		//FQuat newRotation = worldRotation * childsrt.GetRotation();
+
+		FTransform worldsrt = childsrt * grabbingSelector->Cursor();
 
 		//set the clients world transform to the result
-		clientComponent->SetWorldLocationAndRotation(newPosition, newRotation.Rotator());
+		//clientComponent->SetWorldLocationAndRotation(newPosition, newRotation.Rotator());
+		clientComponent->SetWorldTransform(worldsrt);
 	}
 }
