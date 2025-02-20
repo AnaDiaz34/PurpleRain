@@ -17,10 +17,10 @@ public:
 	UMover();
 
 	UFUNCTION(BlueprintCallable, Category = "VAR")
-	void MoveUpDown(const float Value);
+	void MoveUpDown(const float value);
 
 	UFUNCTION(BlueprintCallable, Category = "VAR")
-	void Rotate(const float Value);
+	void Rotate(const float value);
 
 protected:
 	// Called when the game starts
