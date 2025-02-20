@@ -40,6 +40,8 @@ void UDirectSelector::BeginPlay()
 void UDirectSelector::SetCursor()
 {
 	// Set the cursor FTransform to the world location of the controller.
+	cursor.SetLocation(hand->GetComponentLocation());
+	cursor.SetRotation(hand->GetComponentQuat());
 }
 
 void UDirectSelector::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -50,6 +52,13 @@ void UDirectSelector::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, 
 	FString resultString;
 	OtherComp->GetName(resultString);
 	UE_LOG(LogTemp, Warning, TEXT("OnOverLapBegin:%s"), *resultString);
+	UVodget* foundVodget = OtherActor->FindComponentByClass<UVodget>();
+	if (foundVodget)
+	{
+		focusVodget = foundVodget;
+		focusWillBeLostOnRelease = true;
+		UE_LOG(LogTemp, Warning, TEXT("Found Vodget:%s"), *OtherActor->GetName());
+	}
 
 }
 
@@ -61,7 +70,11 @@ void UDirectSelector::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, cl
 	FString resultString;
 	OtherComp->GetName(resultString);
 	UE_LOG(LogTemp, Warning, TEXT("OnOverLapEnd:%s"), *resultString);
+	if (focusVodget && focusVodget->GetOwner() == OtherActor)
+	{
+		focusWillBeLostOnRelease = true;
 
+	}
 }
 
 void UDirectSelector::GrabFocus(bool val)
@@ -71,5 +84,8 @@ void UDirectSelector::GrabFocus(bool val)
 	// If focus grab is being released and we exited the focusVodget while grabbed
 	// release the current focusVodget, otherwise our cursor is still overlapping focusVodget
 	// and nothing needs to be changed.
-	
+	if (!focus_grabbed && focusWillBeLostOnRelease)
+	{
+		focusVodget = nullptr;
+	}
 }

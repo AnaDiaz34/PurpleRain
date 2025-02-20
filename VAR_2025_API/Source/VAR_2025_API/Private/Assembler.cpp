@@ -1,5 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+//notes!
+//when you are in grabber mode DONT COPY THE GRABBER CODE youre a grabber silly!!!
+
+//without letting go want 
+
 
 #include "Assembler.h"
 
