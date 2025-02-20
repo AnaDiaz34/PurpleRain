@@ -20,13 +20,21 @@ UDirectSelector::UDirectSelector()
 // Called when the game starts
 void UDirectSelector::BeginPlay()
 {
+	Super::BeginPlay();
 	// ToDo: In the DirectPawn blueprint, add sphere components to the left and right controllers
 	// and configure the sphere collision physics to send overlap events.
 
 	// Next, in this method, cast the hands SceneComponent to UStaticMeshComponent and
 	// add overlap begin and end callbacks to the child mesh.
 	// Hint: An alternative method might be to set the mesh as a property and configure in the pawn.
-
+	
+	UStaticMeshComponent* collider = Cast<UStaticMeshComponent>(hand);
+	if (collider != nullptr)
+	{
+		collider->OnComponentBeginOverlap.AddDynamic(this, &UDirectSelector::OnOverlapBegin);
+		collider->OnComponentEndOverlap.AddDynamic(this, &UDirectSelector::OnOverlapEnd);
+	}
+	
 }
 
 void UDirectSelector::SetCursor()
@@ -39,6 +47,9 @@ void UDirectSelector::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, 
 	// Search for Vodget components even when focus is grabbed.
 	// When focus is grabbed it is possible to exit our current focusVodget. If this occurs 
 	// we keep track of the exit to allow focus to be lost when focus grab is released.
+	FString resultString;
+	OtherComp->GetName(resultString);
+	UE_LOG(LogTemp, Warning, TEXT("OnOverLapBegin:%s"), *resultString);
 
 }
 
@@ -47,6 +58,9 @@ void UDirectSelector::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, cl
 	// Release focusVodget when focus is not grabbed.
 	// When focus is grabbed it is possible to re-enter our current focusVodget. If this occurs 
 	// we keep track of the re-entry to prevent focus from being lost when focus grab is released.
+	FString resultString;
+	OtherComp->GetName(resultString);
+	UE_LOG(LogTemp, Warning, TEXT("OnOverLapEnd:%s"), *resultString);
 
 }
 
