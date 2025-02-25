@@ -101,14 +101,14 @@ void UWorldGrabber::SetLocalCursor()
 void UWorldGrabber::LWorldGrab(const bool Value)
 {
 	leftGrabbing = Value;
-	UE_LOG(LogTemp, Warning, TEXT("WorldGrabber LEFT:%s"), *FString((Value) ? "GRAB" : "RELEASE"));
+	//UE_LOG(LogTemp, Warning, TEXT("WorldGrabber LEFT:%s"), *FString((Value) ? "GRAB" : "RELEASE"));
 	GrabChanged();
 }
 
 void UWorldGrabber::RWorldGrab(const bool Value)
 {
 	rightGrabbing = Value;
-	UE_LOG(LogTemp, Warning, TEXT("WorldGrabber RIGHT:%s"), *FString((Value) ? "GRAB" : "RELEASE"));
+	//UE_LOG(LogTemp, Warning, TEXT("WorldGrabber RIGHT:%s"), *FString((Value) ? "GRAB" : "RELEASE"));
 	GrabChanged();
 }
 
