@@ -15,7 +15,7 @@ UMover::UMover()
 
 void UMover::MoveUpDown(const float percentage)
 {
-	UE_LOG(LogTemp, Warning, TEXT("UpDown:%f"), percentage);
+	//UE_LOG(LogTemp, Warning, TEXT("UpDown:%f"), percentage);
 
 	float newZ = percentage * 100.0f;
 	FVector newLocation = GetRelativeLocation();
@@ -26,7 +26,7 @@ void UMover::MoveUpDown(const float percentage)
 
 void UMover::Rotate(const float degrees)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Rotate:%f"), degrees);
+	//UE_LOG(LogTemp, Warning, TEXT("Rotate:%f"), degrees);
 	FQuat newRotation = FQuat(FVector::UpVector, FMath::DegreesToRadians(degrees));
 	SetRelativeRotation(newRotation);
 }

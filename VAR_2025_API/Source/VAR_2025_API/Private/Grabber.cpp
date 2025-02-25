@@ -8,6 +8,17 @@ void UGrabber::Focus(USelector* selector, bool state)
 
 void UGrabber::ForePinch(USelector* selector, bool state)
 {
+	if (grabbingSelector != nullptr && selector != grabbingSelector )
+	{
+		if (state)
+		{
+			grabbingSelector->GrabFocus(false);
+		}
+		else 
+		{
+			return;
+		}
+	}
 	// ToDo: On Grab button true, set childsrt to the clients transform as a child of the selectors cursor.
 	// You must also grab the selectors focus during the grab and release it when finished.
 

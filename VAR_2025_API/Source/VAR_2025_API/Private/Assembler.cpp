@@ -19,7 +19,7 @@ void UAssembler::BeginPlay()
 	Super::BeginPlay();
 
 	// Setup overlap callbacks. 
-	pinDock = GetOwner()->FindComponentByClass<USphereComponent>();
+	pinDock = clientComponent->GetOwner()->FindComponentByClass<USphereComponent>();
 	clientComponent = Cast<UStaticMeshComponent>(GetOwner()->FindComponentByClass<UStaticMeshComponent>());
 	if (pinDock)
 	{
@@ -73,14 +73,15 @@ void UAssembler::ForePinch(USelector* selector, bool state)
 	if (!isDocked)//if wheel isnt docked its just a regualr grabber
 	{
 		UGrabber::ForePinch(selector, state);
-		return;
+		UE_LOG(LogTemp, Warning, TEXT("Turning the wheel to a regular grabber in forepinch"));
+		return;	
 	}
 
+	selector->GrabFocus(state);
 	if (state)
 	{
 		FVector handPosition = selector->Cursor().GetLocation();
-		FVector wheelPosition = clientComponent->GetComponentLocation();
-		float grabDistanceSq = FVector::DistSquared(handPosition, wheelPosition);
+		float grabDistanceSq = FVector::DistSquared(handPosition, grabvecAfterSnap);
 
 		if (grabDistanceSq < unsnapDistSq)
 		{
@@ -111,14 +112,15 @@ void UAssembler::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	if (!isDocked)//if wheel isnt docked its just a regualr grabber
 	{
 		UGrabber::TickComponent(DeltaTime, TickType, ThisTickFunction);
+		UE_LOG(LogTemp, Warning, TEXT("Turning the wheel to a regular grabber in tickcomponent"));
 		return;
+
 	}
 
 	if (grabbingSelector)
 	{
 		FVector handPosition = grabbingSelector->Cursor().GetLocation();
-		FVector wheelPosition = clientComponent->GetComponentLocation();
-		float grabDistanceSq = FVector::DistSquared(handPosition, wheelPosition);
+		float grabDistanceSq = FVector::DistSquared(handPosition, grabvecAfterSnap);
 
 		if (grabDistanceSq > unsnapDistSq)
 		{
@@ -142,7 +144,10 @@ void UAssembler::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 
 		FQuat deltaQ = FQuat::FindBetweenVectors(grabvec, currentVect);
 
-		clientComponent->AddRelativeRotation(deltaQ);
+		FQuat slerpQ = FQuat::Slerp(FQuat::Identity, deltaQ, 0.8f);
+		clientComponent->AddRelativeRotation(slerpQ);
+
+		//clientComponent->AddRelativeRotation(deltaQ);
 
 		grabvec = currentVect;
 	}
